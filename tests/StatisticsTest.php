@@ -1,21 +1,30 @@
 <?php
 
-namespace Statistics\Tests;
+namespace JWorman\Statistics\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Statistics\Statistics;
+
+use function JWorman\Statistics\mean;
+use function JWorman\Statistics\standardDeviation;
+use function JWorman\Statistics\variance;
+
+use const JWorman\Statistics\POPULATION;
+use const JWorman\Statistics\SAMPLE;
 
 class StatisticsTest extends TestCase
 {
+    const INT_SAMPLE = [-16, -46, 100, 99, -13];
+    const FLOAT_SAMPLE = [85.5945925643064, -7.53563844854945, -21.4031910838233, 34.3417313490613, -66.5000275780948];
+
     /**
-     * @covers       \Statistics\Statistics::mean
+     * @covers       \JWorman\Statistics\Statistics::mean
      * @dataProvider provideDataForTestMean
      * @param array $samples
      * @param float|int $expectedResult
      */
     public function testMean(array $samples, $expectedResult)
     {
-        $result = Statistics::mean($samples);
+        $result = mean($samples);
         $this->assertEquals($expectedResult, $result);
     }
 
@@ -25,13 +34,13 @@ class StatisticsTest extends TestCase
     public function provideDataForTestMean()
     {
         return [
-            [[1, 2, 3, 4, 5], 3],
-            [[1.1, 2.1, 3.1, 4.1, 5.1], 3.1],
+            [self::INT_SAMPLE, 24.8],
+            [self::FLOAT_SAMPLE, 4.89949336058003],
         ];
     }
 
     /**
-     * @covers       \Statistics\Statistics::variance
+     * @covers       \JWorman\Statistics\Statistics::variance
      * @dataProvider provideDataForTestVariance
      * @param array $samples
      * @param string $type
@@ -39,7 +48,7 @@ class StatisticsTest extends TestCase
      */
     public function testVariance(array $samples, $type, $expectedResult)
     {
-        $result = Statistics::variance($samples, $type);
+        $result = variance($samples, $type);
         $this->assertEquals($expectedResult, $result);
     }
 
@@ -49,15 +58,15 @@ class StatisticsTest extends TestCase
     public function provideDataForTestVariance()
     {
         return [
-            [[1, 2, 3, 4, 5], Statistics::TYPE_POPULATION, 2],
-            [[1, 2, 3, 4, 5], Statistics::TYPE_SAMPLE, 2.5],
-            [[1.1, 2.1, 3.1, 4.1, 5.1], Statistics::TYPE_POPULATION, 2],
-            [[1.1, 2.1, 3.1, 4.1, 5.1], Statistics::TYPE_SAMPLE, 2.5],
+            [self::INT_SAMPLE, SAMPLE, 4816.7],
+            [self::INT_SAMPLE, POPULATION, 3853.36],
+            [self::FLOAT_SAMPLE, SAMPLE, 3330.72492890854],
+            [self::FLOAT_SAMPLE, POPULATION, 2664.57994312683],
         ];
     }
 
     /**
-     * @covers       \Statistics\Statistics::standardDeviation
+     * @covers       \JWorman\Statistics\Statistics::standardDeviation
      * @dataProvider provideDataForTestStandardDeviation
      * @param array $samples
      * @param string $type
@@ -65,7 +74,7 @@ class StatisticsTest extends TestCase
      */
     public function testStandardDeviation(array $samples, $type, $expectedResult)
     {
-        $result = Statistics::standardDeviation($samples, $type);
+        $result = standardDeviation($samples, $type);
         $this->assertEquals($expectedResult, $result);
     }
 
@@ -75,10 +84,10 @@ class StatisticsTest extends TestCase
     public function provideDataForTestStandardDeviation()
     {
         return [
-            [[1, 2, 3, 4, 5], Statistics::TYPE_POPULATION, \sqrt(2)],
-            [[1, 2, 3, 4, 5], Statistics::TYPE_SAMPLE, \sqrt(2.5)],
-            [[1.1, 2.1, 3.1, 4.1, 5.1], Statistics::TYPE_POPULATION, \sqrt(2)],
-            [[1.1, 2.1, 3.1, 4.1, 5.1], Statistics::TYPE_SAMPLE, \sqrt(2.5)],
+            [self::INT_SAMPLE, SAMPLE, 69.4024495244944],
+            [self::INT_SAMPLE, POPULATION, 62.075437976707],
+            [self::FLOAT_SAMPLE, SAMPLE, 57.7124330530999],
+            [self::FLOAT_SAMPLE, POPULATION, 51.6195693814549],
         ];
     }
 }

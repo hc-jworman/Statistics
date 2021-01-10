@@ -4,12 +4,15 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Statistics\\": "src/"
-        }
+            "JWorman\\Statistics\\": "src/"
+        },
+        "files": [
+            "src/Statistics.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Statistics\\Tests\\": "tests/"
+            "JWorman\\Statistics\\Tests\\": "tests/"
         }
     },
     "require": {

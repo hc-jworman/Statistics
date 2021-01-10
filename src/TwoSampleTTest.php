@@ -1,76 +1,47 @@
 <?php
 
-namespace Statistics;
+namespace JWorman\Statistics;
 
 class TwoSampleTTest
 {
-    /** @var array */
-    private $sample1;
-    /** @var int */
-    private $n1;
-    /** @var float|int */
-    private $mean1;
-    /** @var float|int */
-    private $variance1;
+    const TWO_TAILED = 'two_tailed';
+    const RIGHT_TAILED = 'right_tailed';
 
-    /** @var array */
-    private $sample2;
-    /** @var int */
-    private $n2;
-    /** @var float|int */
-    private $mean2;
-    /** @var float|int */
-    private $variance2;
-
-    /** @var float|int */
-    private $df;
-
-    public function __construct(array $sample1, array $sample2)
+    /**
+     * @param array $sample1
+     * @param array $sample2
+     * @param string $type
+     * @param int $significance
+     * @return bool
+     */
+    public static function test(array $sample1, array $sample2, $type = self::TWO_TAILED, $significance = 3)
     {
-        $this->sample1 = $sample1;
-        $this->n1 = \count($sample1);
-        $this->mean1 = Statistics::mean($sample1);
-        $this->variance1 = Statistics::variance($sample1);
+        $x1 = mean($sample1);
+        $v1 = variance($sample1);
+        $n1 = \count($sample1);
 
-        $this->sample2 = $sample2;
-        $this->n2 = \count($sample2);
-        $this->mean2 = Statistics::mean($sample2);
-        $this->variance2 = Statistics::variance($sample2);
+        $x2 = mean($sample2);
+        $v2 = variance($sample2);
+        $n2 = \count($sample2);
 
-        $this->calculateDegreesOfFreedom();
-    }
+        $df = self::calculateDegreesOfFreedom($v1, $n1, $v2, $n2);
 
-    private function calculateDegreesOfFreedom()
-    {
-        $num = \pow(($this->variance1 / $this->n1) / ($this->variance2 / $this->n2), 2);
-        $den = (\pow($this->variance1, 2) / (\pow($this->n1, 2) * ($this->n1 - 1)))
-            / (\pow($this->variance2, 2) / (\pow($this->n2, 2) * ($this->n2 - 1)));
-        $this->df = \floor($num / $den);
-        if ($this->df < 1 || $this->df > 1000) {
-            throw new \InvalidArgumentException('');
+        $t = ($x1 - $x2) / \sqrt(($v1 / $n1) + ($v2 / $n2));
+        $tCritical = InverseTTable::getTScore($type, $df, $significance);
+        if ($type === self::TWO_TAILED) {
+            return \abs($t) > $tCritical;
+        } elseif ($type === self::RIGHT_TAILED) {
+            return $t > $tCritical;
+        } else {
+            throw new \InvalidArgumentException();
         }
     }
 
-    public function test($significanceLevel = 0.05)
+    private static function calculateDegreesOfFreedom($v1, $n1, $v2, $n2)
     {
-        $t = ($this->mean1 - $this->mean2) / \sqrt(($this->variance1 / $this->n1) + ($this->variance2 / $this->n2));
-        $tCritical = $this->getTCritical($significanceLevel);
-        return \abs($t) > $tCritical;
-    }
-
-    private function getTCritical($significanceLevel)
-    {
-        $csv = \array_map('str_getcsv', \file(__DIR__ . '/../InvTTable.csv'));
-        $row = $csv[$this->df - 1];
-        switch ($significanceLevel) {
-            case 0.05:
-                return (float)$row[1];
-            case 0.01:
-                return (float)$row[2];
-            case 0.001:
-                return (float)$row[3];
-            default:
-                throw new \InvalidArgumentException('Unsupported significance level: ' . $significanceLevel);
-        }
+        $num = \pow(($v1 / $n1) + ($v2 / $n2), 2);
+        $den = (\pow($v1, 2) / (\pow($n1, 2) * ($n1 - 1)))
+            / (\pow($v2, 2) / (\pow($n2, 2) * ($n2 - 1)));
+        return \floor($num / $den);
     }
 }
