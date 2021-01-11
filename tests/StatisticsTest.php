@@ -56,18 +56,4 @@ final class StatisticsTest extends TestCase
         $this->expectException(EmptySampleException::class);
         standardDeviation([]);
     }
-
-    /**
-     * @covers \JWorman\Statistics\twoSampleTTest
-     */
-    public function testTwoSampleTTest()
-    {
-        $sample1 = [14, 15, 15, 15, 16, 18, 22, 23, 24, 25, 25];
-        $sample2 = [10, 12, 14, 15, 18, 22, 24, 27, 31, 33, 34, 34, 34];
-        $this->assertFalse(twoSampleTTest($sample1, $sample2));
-
-        $sample1 = [0, 0, 0, 0, 0, 0, 0, 0, 1];
-        $sample2 = [20, 20, 20, 20, 20, 20, 20, 21];
-        $this->assertTrue(twoSampleTTest($sample1, $sample2));
-    }
 }
