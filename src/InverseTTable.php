@@ -29,6 +29,9 @@ final class InverseTTable
      */
     public static function getTCritical($tail, $df, $sigma)
     {
+        if ($df > 1000) {
+            $df = 1000;
+        }
         if ($tail === TTest::TWO_TAIL) {
             $inverseTTableFile = self::TWO_TAIL_FILE;
             $csv = \array_map('str_getcsv', \file($inverseTTableFile));
